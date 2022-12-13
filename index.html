@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        .mh_50 {
+            min-height: 50px;
+        }
+        .fs_small {
+            font-size: small;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="container">
+        <ul class="nav nav-tabs" id="myTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="first_tab" data-bs-toggle="tab" data-bs-target="#noc2011"
+                    role="tab">NOC 2011</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="second_tab" data-bs-toggle="tab" data-bs-target="#soc2010" role="tab">soc2010</button>
+            </li>
+        </ul>
+        <div class="tab-content" id="myContent">
+            <div id="noc2011" class="tab-pane fade">
+                <form>
+                    <div class="mb-3">
+                        <label for="noc2011_input">noc 2011 code</label>
+                        <input type="text" class="form-control" id="noc2011_input">
+                    </div>
+                    <label class="fs_small" for="noc_title">title</label><div class="mh_50 bg-light mb-3 p-3" id="noc_title"></div>
+                    <label class="fs_small" for="enc_out">encoded vector</label><div class="d-flex flex-wrap mh_50 bg-light mb-3 me-3 p-3 justify-content-start" id="enc_out"></div>
+                    <label class="fs_small" for="noc_out">xwalked noc 2011 code</label><div class="mh_50 bg-light mv-3 p-3" id="noc_out"></div>
+                    <label class="fs_small" for="soc_out">xwalked soc 2011 code</label><div class="mh_50 bg-light mb-3 p-3" id="soc_out"></div>
+                    <div class="d-flex justify-content-center"><button id="runButton" type="button" class="btn btn-primary mb-3">crosswalk</button></div>
+                </form>
+            </div>
+            <div id="soc2010" class="tab-pane fade show active">
+                <div class="mb-3">
+                    <label for="soc2010_input">soc 2010 code</label>
+                    <input type="text" class="form-control" id="soc2010_input">
+                    <label class="fs_small" for="soc2010_title">title</label><div class="mh_50 bg-light mb-3 p-3" id="soc2010_title"></div>
+                    <label class="fs_small" for="enc_t2_out">encoded vector</label><div class="d-flex flex-wrap mh_50 bg-light mb-3 me-3 p-3 justify-content-start" id="enc_t2_out"></div>
+                    <label class="fs_small" for="soc_t2_out">xwalked soc 2011 code</label><div class="mh_50 bg-light mb-3 p-3" id="soc_t2_out"></div>
+                    <label class="fs_small" for="noc_t2_out">xwalked noc 2011 code</label><div class="mh_50 bg-light mv-3 p-3" id="noc_t2_out"></div>
+                    <div class="d-flex justify-content-center"><button id="runButton_t2" type="button" class="btn btn-primary mb-3">crosswalk</button></div>
+
+                </div>
+            
+            </div>
+        </div>
+    </div>
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+    crossorigin="anonymous"></script>
+<script src="index.js"></script>
+<script>
+    
+    document.getElementById("runButton").addEventListener("click",async (event)=>{
+        const noc2011_input = document.getElementById("noc2011_input")
+        const enc_out=document.getElementById("enc_out")
+        const noc_out=document.getElementById("noc_out")
+        const soc_out=document.getElementById("soc_out")
+
+        if (noc2011_4d.codes.includes(noc2011_input.value)){
+            noc2011_input.setCustomValidity("")
+            document.getElementById("noc_title").innerText=noc2011_4d.occupations[noc2011_4d.code_lookup[noc2011_input.value]].title
+            let encoded_tensor = await noc_encode(noc2011_input.value)
+            enc_out.innerText=""
+            encoded_tensor.dataSync().forEach( v => enc_out.insertAdjacentHTML("beforeend",`<span class='font-monospace pe-3'>${v.toFixed(3)}</span>`))
+            let decoded_noc = await noc_decode(encoded_tensor)
+            noc_out.innerText=decoded_noc
+            let decoded_soc = await soc_decode(encoded_tensor)
+            soc_out.innerText=decoded_soc
+            encoded_tensor.dispose()
+        } else{
+            noc2011_input.setCustomValidity( "Not a valid noc2011 code" )
+            document.getElementById("noc_title").innerText=""
+            enc_out.innerText=""
+            noc_out.innerText=""
+            soc_out.innerText=""
+        }
+        noc2011_input.reportValidity()
+    })
+
+    document.getElementById("runButton_t2").addEventListener("click",async (event)=>{
+        const soc2010_input = document.getElementById("soc2010_input")
+        const title_out=document.getElementById("soc2010_title")
+        const enc_out=document.getElementById("enc_t2_out")
+        const noc_out=document.getElementById("noc_t2_out")
+        const soc_out=document.getElementById("soc_t2_out")
+        if (soc2010_6d.codes.includes(soc2010_input.value)){
+            soc2010_input.setCustomValidity( "" )
+            title_out.innerText=soc2010_6d.occupations[soc2010_input.value].title
+            let encoded_tensor = await soc2010_encode(soc2010_input.value)
+            enc_out.innerText=""
+            encoded_tensor.dataSync().forEach( v => enc_out.insertAdjacentHTML("beforeend",`<span class='font-monospace pe-3'>${v.toFixed(3)}</span>`))
+            let decoded_noc = await noc_decode(encoded_tensor)
+            noc_out.innerText=decoded_noc
+            let decoded_soc = await soc_decode(encoded_tensor)
+            soc_out.innerText=decoded_soc
+            encoded_tensor.dispose()
+        }else{
+            soc2010_input.setCustomValidity( "Not a valid soc2010 code" )
+            title_out.innerText=""
+            enc_out.innerText=""
+            noc_out.innerText=""
+            soc_out.innerText=""
+        }
+        soc2010_input.reportValidity()
+    })
+</script>
+</html>
