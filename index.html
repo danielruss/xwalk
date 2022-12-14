@@ -6,6 +6,9 @@
         .mh_50 {
             min-height: 50px;
         }
+        .mh_1r {
+            min-height: 1.5rem;
+        }
         .fs_small {
             font-size: small;
         }
@@ -23,7 +26,7 @@
                     role="tab">NOC 2011</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="second_tab" data-bs-toggle="tab" data-bs-target="#soc2010" role="tab">soc2010</button>
+                <button class="nav-link active" id="second_tab" data-bs-toggle="tab" data-bs-target="#soc2010" role="tab">SOC 2010</button>
             </li>
         </ul>
         <div class="tab-content" id="myContent">
@@ -35,8 +38,8 @@
                     </div>
                     <label class="fs_small" for="noc_title">title</label><div class="mh_50 bg-light mb-3 p-3" id="noc_title"></div>
                     <label class="fs_small" for="enc_out">encoded vector</label><div class="d-flex flex-wrap mh_50 bg-light mb-3 me-3 p-3 justify-content-start" id="enc_out"></div>
-                    <label class="fs_small" for="noc_out">xwalked noc 2011 code</label><div class="mh_50 bg-light mv-3 p-3" id="noc_out"></div>
-                    <label class="fs_small" for="soc_out">xwalked soc 2011 code</label><div class="mh_50 bg-light mb-3 p-3" id="soc_out"></div>
+                    <label class="fs_small" for="noc_out">xwalked noc 2011 code</label><div class="mh_1r bg-light mv-3 ps-3" id="noc_out"></div>
+                    <label class="fs_small" for="soc_out">xwalked soc 2011 code</label><div class="mh_1r bg-light mb-3 ps-3" id="soc_out"></div>
                     <div class="d-flex justify-content-center"><button id="runButton" type="button" class="btn btn-primary mb-3">crosswalk</button></div>
                 </form>
             </div>
@@ -46,8 +49,8 @@
                     <input type="text" class="form-control" id="soc2010_input">
                     <label class="fs_small" for="soc2010_title">title</label><div class="mh_50 bg-light mb-3 p-3" id="soc2010_title"></div>
                     <label class="fs_small" for="enc_t2_out">encoded vector</label><div class="d-flex flex-wrap mh_50 bg-light mb-3 me-3 p-3 justify-content-start" id="enc_t2_out"></div>
-                    <label class="fs_small" for="soc_t2_out">xwalked soc 2011 code</label><div class="mh_50 bg-light mb-3 p-3" id="soc_t2_out"></div>
-                    <label class="fs_small" for="noc_t2_out">xwalked noc 2011 code</label><div class="mh_50 bg-light mv-3 p-3" id="noc_t2_out"></div>
+                    <label class="fs_small" for="soc_t2_out">xwalked soc 2011 code</label><div class="bg-light mh_1r mb-3 ps-3" id="soc_t2_out"></div>
+                    <label class="fs_small" for="noc_t2_out">xwalked noc 2011 code</label><div class="bg-light mh_1r mb-3 ps-3" id="noc_t2_out"></div>
                     <div class="d-flex justify-content-center"><button id="runButton_t2" type="button" class="btn btn-primary mb-3">crosswalk</button></div>
 
                 </div>
@@ -62,7 +65,12 @@
     crossorigin="anonymous"></script>
 <script src="index.js"></script>
 <script>
-    
+    function make_spans(array,lookup,div){
+        div.innerText=""
+        array.forEach(code => {
+            div.insertAdjacentHTML("beforeend",`<div class="row py-1 border-bottom border-white "><div class="col-2">${code}</div><div class="col-10">${lookup[code]}</div></div>`)
+        });
+    }
     document.getElementById("runButton").addEventListener("click",async (event)=>{
         const noc2011_input = document.getElementById("noc2011_input")
         const enc_out=document.getElementById("enc_out")
@@ -76,9 +84,9 @@
             enc_out.innerText=""
             encoded_tensor.dataSync().forEach( v => enc_out.insertAdjacentHTML("beforeend",`<span class='font-monospace pe-3'>${v.toFixed(3)}</span>`))
             let decoded_noc = await noc_decode(encoded_tensor)
-            noc_out.innerText=decoded_noc
+            make_spans(decoded_noc,noc2011_4d.title_lookup,noc_out)
             let decoded_soc = await soc_decode(encoded_tensor)
-            soc_out.innerText=decoded_soc
+            make_spans(decoded_soc,soc2010_6d.title_lookup,soc_out)
             encoded_tensor.dispose()
         } else{
             noc2011_input.setCustomValidity( "Not a valid noc2011 code" )
@@ -103,9 +111,9 @@
             enc_out.innerText=""
             encoded_tensor.dataSync().forEach( v => enc_out.insertAdjacentHTML("beforeend",`<span class='font-monospace pe-3'>${v.toFixed(3)}</span>`))
             let decoded_noc = await noc_decode(encoded_tensor)
-            noc_out.innerText=decoded_noc
+            make_spans(decoded_noc,noc2011_4d.title_lookup,noc_out)
             let decoded_soc = await soc_decode(encoded_tensor)
-            soc_out.innerText=decoded_soc
+            make_spans(decoded_soc,soc2010_6d.title_lookup,soc_out)
             encoded_tensor.dispose()
         }else{
             soc2010_input.setCustomValidity( "Not a valid soc2010 code" )

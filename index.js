@@ -14,6 +14,10 @@ let soc2010_6d = {};
         pv[cv.code] = indx
         return pv;
     },{})
+    noc2011_4d.title_lookup=noc2011_4d.occupations.reduce((pv,cv,indx)=>{
+        pv[cv.code] = cv.title
+        return pv;
+    },{})
     console.log("noc2011 loaded...")
     console.log("loading soc2010...")
     soc2010_6d.occupations = (await (await fetch("https://danielruss.github.io/codingsystems/soc_2010_complete.json")).json()).codes
@@ -24,12 +28,13 @@ let soc2010_6d = {};
         pv[cv] = indx
         return pv;
     },{})
+    soc2010_6d.title_lookup=Object.values(soc2010_6d.occupations).reduce((pv,cv)=>{
+        pv[cv.code] = cv.title
+        return pv;
+    },{})
     console.log("soc2010 loaded...")
 
     console.log("loading models...")
-//    models.noc2011_encoder = await tf.loadLayersModel('http://localhost:8000/models/noc2011_4d_encoder_js/model.json')
-//    models.noc2011_decoder = await tf.loadLayersModel('http://localhost:8000/models/noc2011_4d_decoder_js/model.json')
-
     models.noc2011_encoder = await tf.loadLayersModel('./models/noc2011_4d_encoder_js/model.json')
     models.noc2011_decoder = await tf.loadLayersModel('./models/noc2011_4d_decoder_js/model.json')
     models.soc2010_encoder = await tf.loadLayersModel('./models/soc2010_6d_encoder_js/model.json')
