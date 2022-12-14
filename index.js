@@ -27,11 +27,13 @@ let soc2010_6d = {};
     console.log("soc2010 loaded...")
 
     console.log("loading models...")
-    models.noc2011_encoder = await tf.loadLayersModel('http://localhost:8000/models/noc2011_4d_encoder_js/model.json')
-    models.noc2011_decoder = await tf.loadLayersModel('http://localhost:8000/models/noc2011_4d_decoder_js/model.json')
+//    models.noc2011_encoder = await tf.loadLayersModel('http://localhost:8000/models/noc2011_4d_encoder_js/model.json')
+//    models.noc2011_decoder = await tf.loadLayersModel('http://localhost:8000/models/noc2011_4d_decoder_js/model.json')
+    models.noc2011_encoder = await tf.loadLayersModel('http:./models/noc2011_4d_encoder_js/model.json')
+    models.noc2011_decoder = await tf.loadLayersModel('http:./models/noc2011_4d_decoder_js/model.json')
 
-    models.soc2010_encoder = await tf.loadLayersModel('http://localhost:8000/models/soc2010_6d_encoder_js/model.json')
-    models.soc2010_decoder = await tf.loadLayersModel('http://localhost:8000/models/soc2010_6d_decoder_js/model.json')
+    models.soc2010_encoder = await tf.loadLayersModel('./models/soc2010_6d_encoder_js/model.json')
+    models.soc2010_decoder = await tf.loadLayersModel('./models/soc2010_6d_decoder_js/model.json')
     console.log("all models loaded...")
 })()
 
